@@ -12,6 +12,7 @@ class PTCPRGFile extends PTCFile {
 
     public constructor() {
         super();
+        this.Type = PTCFileType.PRG;
         this.Content = "";
         this.PackagedFiles = new Map();
         this.MysteryBytes = Buffer.alloc(4);
@@ -26,7 +27,6 @@ class PTCPRGFile extends PTCFile {
         let self = new PTCPRGFile();
         self.Header = file.Header;
         self.RawContent = file.RawContent;
-        self.Type = PTCFileType.PRG;
 
         self.RawContent.copy(self.MysteryBytes, 0, 0, 4);
         
