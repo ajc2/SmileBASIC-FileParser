@@ -14,11 +14,17 @@ class PTCFile implements GenericFile {
     /**
      * A PTCSDHeader, if parsed from or generated to a SD file.
      */
-    Header: PTCSDHeader;
+    public Header: PTCSDHeader;
 
-    RawContent: Buffer;
+    /**
+     * Unparsed file contents, after SD header, PETC magic, and type code
+     */
+    public RawContent: Buffer;
 
-    Type: PTCFileType | null;
+    /**
+     * Corresponding resource type
+     */
+    public Type: PTCFileType | null;
 
     
     public static FileTypeMappings: Map<PTCFileType, typeof PTCFile> = new Map();
@@ -33,19 +39,19 @@ class PTCFile implements GenericFile {
     public static async FromBuffer(buffer: Buffer, verifyHash: boolean = false): Promise<PTCFile> {
         let file = new PTCFile();
 
-        let magic = buffer.toString('ascii', 0, 4);
+        let magic = buffer.toString('latin1', 0, 4);
         if(magic === "PX01") {
             // decode SD header
             file.Header = PTCSDHeader.FromBuffer(buffer);
 
             // make sure the file magic is here
-            magic = buffer.toString('ascii', 36, 4);
+            magic = buffer.toString('latin1', 36, 40);
             if(magic !== "PETC") {
                 throw new Error("File does not appear to be PTC format");
             }
 
             // decode the rest of the file
-            let typecode = buffer.toString('ascii', 40, 8);
+            let typecode = buffer.toString('latin1', 40, 48);
             file.Type = typeStringToEnum(typecode);
             file.RawContent = buffer.subarray(48);
 
@@ -55,7 +61,7 @@ class PTCFile implements GenericFile {
             }
         }
         else if(magic === "PETC") {
-            let typecode = buffer.toString('ascii', 4, 8);
+            let typecode = buffer.toString('latin1', 4, 12);
             file.Type = typeStringToEnum(typecode);
             file.RawContent = buffer.subarray(12);
         }
@@ -94,8 +100,8 @@ class PTCFile implements GenericFile {
 
         return Buffer.concat([
             start,
-            Buffer.from("PETC", 'ascii'),
-            Buffer.from(typeEnumToString(this.Type!), 'ascii'),
+            Buffer.from("PETC", 'latin1'),
+            Buffer.from(typeEnumToString(this.Type!), 'latin1'),
             this.RawContent
         ]);
     }
@@ -111,7 +117,7 @@ class PTCFile implements GenericFile {
         return this;
     }
 
-    //public async ToQRFrames(): Promise<Buffer[]> = TODO();
+    //public async ToQRFrames(qrCapacity: number): Promise<Buffer[]> = TODO();
 
     
     private verifyHash(): boolean {
@@ -122,7 +128,9 @@ class PTCFile implements GenericFile {
     
     private createMD5(): Buffer {
         let hash = createHash('MD5');
-        hash.update("PETITCOM", 'ascii');
+        hash.update("PETITCOM", 'latin1');
+        hash.update("PETC", 'latin1');
+        hash.update(typeEnumToString(this.Type!), 'latin1');
         hash.update(this.RawContent);
         return hash.digest();
     }

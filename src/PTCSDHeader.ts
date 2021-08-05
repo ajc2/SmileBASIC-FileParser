@@ -28,7 +28,7 @@ class PTCSDHeader {
     
     public constructor() {
         this.FileName = "";
-        this.MysteryBytes = Buffer.allocUnsafe(4);
+        this.MysteryBytes = Buffer.alloc(4);
         this.Hash = Buffer.allocUnsafe(16);
         this.HashValid = null;
         this.FileSize = 0;
@@ -38,7 +38,7 @@ class PTCSDHeader {
         let header = new PTCSDHeader();
 
         // verify file magic
-        let magic = buffer.toString('ascii', 0, 4);
+        let magic = buffer.toString('latin1', 0, 4);
         if(magic !== "PX01") {
             throw new Error("Buffer does not contain a SD File or SD Header");
         }
@@ -47,24 +47,24 @@ class PTCSDHeader {
         header.FileSize = buffer.readUInt32LE(4);
 
         // get the mystery bytes
-        buffer.copy(header.MysteryBytes, 0, 8);
+        buffer.copy(header.MysteryBytes, 0, 8, 12);
 
         // get the file name
-        header.FileName = buffer.toString('ascii', 12, 8);
+        header.FileName = buffer.toString('latin1', 12, 20);
 
         // get the MD5 hash
-        buffer.copy(header.Hash, 0, 20);
+        buffer.copy(header.Hash, 0, 20, 36);
 
         return header;
     }
 
     public ToBuffer(): Buffer {
         let buffer = Buffer.allocUnsafe(36);
-        buffer.write("PX01", 0, 4, 'ascii');
+        buffer.write("PX01", 0, 4, 'latin1');
         buffer.writeUInt32LE(this.FileSize, 4);
         this.MysteryBytes.copy(buffer, 8);
-        buffer.write(this.FileName, 12, 8, 'ascii');
-        this.Hash.copy(buffer);
+        buffer.write(this.FileName, 12, 8, 'latin1');
+        this.Hash.copy(buffer, 20);
         return buffer;
     }
 }
