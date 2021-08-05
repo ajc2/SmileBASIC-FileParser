@@ -116,3 +116,6 @@ dist
 
 # Built binaries
 lib
+
+# output PTC binaries for testing
+tests/ptc_binaries/*_out.PTC

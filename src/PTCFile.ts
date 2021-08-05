@@ -107,14 +107,12 @@ class PTCFile implements GenericFile {
     }
 
     public async ToActualType(): Promise<PTCFile> {
-        /*
-        if (this.Type !== null && PTCFile.FileTypeMappings.has(this.Type)) {
-            return PTCFile.FileTypeMappings.get(this.Type)!.FromFile(this);
-        } else {
+        if (this.Type !== null && PTCFile.FileTypeMappings.has(this.Type!)) {
+            return PTCFile.FileTypeMappings.get(this.Type!)!.FromFile(this);
+        }
+        else {
             throw new Error("Unimplemented file type");
         }
-        */
-        return this;
     }
 
     //public async ToQRFrames(qrCapacity: number): Promise<Buffer[]> = TODO();
