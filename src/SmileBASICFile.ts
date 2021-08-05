@@ -5,6 +5,7 @@ import { FILE_HEADER_SIZE, FILE_OFFSETS, FILE_TYPES, HMAC_KEY } from "./Constant
 import { createHmac } from "crypto";
 import { SmileBASICFileType } from "./SmileBASICFileType";
 import { SmileBASICFileVersion } from "./SmileBASICFileVersion";
+import { GenericFile } from "./GenericFile";
 
 // Promisify these guys so we aren't using callbacks
 const inflateAsync = promisify(inflate);
@@ -16,7 +17,7 @@ const deflateAsync = promisify(deflate);
  * 
  * If you wish to use file format-specific methods, you can use the {@link SmileBASICFile.ToActualType ToActualType() method} to convert a base instance into the proper file format.
  */
-class SmileBASICFile {
+class SmileBASICFile implements GenericFile {
     /**
      * The parsed {@link Header} of this file.
      */
