@@ -3,6 +3,7 @@ import { promisify } from "util";
 import { createHash, Hash } from "crypto";
 import { GenericFile } from "./GenericFile";
 import { PTCSDHeader } from "./PTCSDHeader";
+import { FileFormat } from "./FileFormat";
 import { PTCFileType, typeStringToEnum, typeEnumToString } from "./PTCFileType";
 
 // Promisify these guys so we aren't using callbacks
@@ -11,6 +12,8 @@ const deflateAsync = promisify(deflate);
 
 
 class PTCFile implements GenericFile {
+    public readonly Format = FileFormat.PTC;
+    
     /**
      * A PTCSDHeader, if parsed from or generated to a SD file.
      */

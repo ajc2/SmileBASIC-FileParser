@@ -1,8 +1,15 @@
+import { FileFormat } from "./FileFormat";
+
 /**
  * Generic file top class interface.
  * Implements the root of both SB3+ and PTC file type hierarchies.
  */
 interface GenericFile {
+    /**
+     * The base format of this file: PTC or SmileBASIC.
+     */
+    Format: FileFormat;
+    
     /**
      * The raw contents of this file as a `Buffer` (if parsed from one or previously generated.)
      */

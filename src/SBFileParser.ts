@@ -21,7 +21,7 @@ async function ParseBuffer(buffer: Buffer, verify: boolean = false): Promise<Gen
             file = await SmileBASICFile.FromBuffer(buffer, verify);
     }
 
-    return await file.ToActualType();
+    return file;
 }
 
 
