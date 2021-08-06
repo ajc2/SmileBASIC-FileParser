@@ -24,7 +24,7 @@ test("PTCCOLFile round trip", async () => {
     let file = await PTCCOLFile.FromBuffer(buf);
     let buf2 = await file.ToBuffer();
     // write the output file for inspection
-    fs.writeFileSync(path.join(__dirname, "ptc_binaries/col_out.PTC"), buf2, {encoding:null});
+    fs.writeFileSync(path.join(__dirname, "ptc_binaries/out/col_out.PTC"), buf2, {encoding:null});
     expect(buf.compare(buf2)).toBe(0);
 });
 
@@ -46,7 +46,7 @@ test("PTCCOLFile palette visual inspection", async () => {
     }
 
     // output image
-    let p = path.join(__dirname, "ptc_binaries/palette.png");
+    let p = path.join(__dirname, "ptc_binaries/out/palette.png");
     let png = fs.writeFileSync(p, Buffer.from(canv.toDataURL().slice(21), 'base64'));
     console.log(`A palette image has been written to ${p}. Please inspect it.`);
 });

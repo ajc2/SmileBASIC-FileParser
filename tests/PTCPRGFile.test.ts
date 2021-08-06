@@ -12,7 +12,7 @@ test("PTCPRGFile round trip", async () => {
     let file = await PTCPRGFile.FromBuffer(buf);
     let buf2 = await file.ToBuffer();
     // write the output file for inspection
-    fs.writeFileSync(path.join(__dirname, "ptc_binaries/prg_out.PTC"), buf2, {encoding:null});
+    fs.writeFileSync(path.join(__dirname, "ptc_binaries/out/prg_out.PTC"), buf2, {encoding:null});
     expect(buf.compare(buf2)).toBe(0);
 });
 

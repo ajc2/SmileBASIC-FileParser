@@ -1,4 +1,5 @@
 import { PTCFile } from "./PTCFile";
+import { PTCCOLFile, PTCColor } from "./PTCCOLFile";
 import { PTCFileType } from "./PTCFileType";
 
 class PTCCHRFile extends PTCFile {
@@ -12,7 +13,10 @@ class PTCCHRFile extends PTCFile {
     public constructor() {
         super();
         this.Type = PTCFileType.CHR;
-        this.Characters = new Array<Buffer>(256).map(()=>Buffer.alloc(64));
+        this.Characters = new Array<Buffer>(256);
+        for(let i = 0; i < 256; i++) {
+            this.Characters[i] = Buffer.alloc(64);
+        }
     }
 
 
@@ -51,7 +55,7 @@ class PTCCHRFile extends PTCFile {
             let char = this.Characters[c];
             for(let i = 0; i < 64; i += 2) {
                 let byte = (char[i+1]<<4) | char[i];
-                chrs[c*32+(i>>2)] = byte;
+                chrs[c*32+(i/2)] = byte;
             }
         }
 
@@ -89,6 +93,23 @@ class PTCCHRFile extends PTCFile {
         }
 
         this.Characters[char][y*64 + x] = color;
+    }
+
+    public CharacterWithPalette(chr: number, col: PTCCOLFile, pal: number): PTCColor[] {
+        if(chr < 0 || chr > 255) {
+            throw new Error(`Character index out of range (${chr})`);
+        }
+        if(pal < 0 || pal > 15) {
+            throw new Error(`Palette index out of range (${pal})`);
+        }
+        let char = this.Characters[chr];
+        let out = new Array(64);
+        const pb = pal * 16;
+        for(let i = 0; i < 64; i++) {
+            out[i] = col.Colors[char[i]+pb];
+        }
+
+        return out;
     }
 }
 
