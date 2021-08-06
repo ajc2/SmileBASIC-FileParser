@@ -16,7 +16,7 @@ function typeEnumToString(en: PTCFileType): string {
         case PTCFileType.CHR:
             return "0100RCHR";
         case PTCFileType.COL:
-            return "0100RCHR";
+            return "0100RCOL";
         case PTCFileType.MEM:
             return "0200RMEM";
         case PTCFileType.GRP:
