@@ -75,7 +75,7 @@ class PTCFile implements GenericFile {
         return file;
     }
 
-    //public static async FromQRFrames(qrs: Buffer[]): Promise<PTCFile> = TODO();
+    //public static async FromQRData(qrs: Buffer[]): Promise<PTCFile> = TODO();
     
     public static async FromFile(file: PTCFile): Promise<PTCFile> {
         return file;
@@ -118,7 +118,7 @@ class PTCFile implements GenericFile {
         }
     }
 
-    //public async ToQRFrames(qrCapacity: number): Promise<Buffer[]> = TODO();
+    //public async ToQRData(qrCapacity: number): Promise<Buffer[]> = TODO();
 
     
     private verifyHash(): boolean {

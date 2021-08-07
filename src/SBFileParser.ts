@@ -9,7 +9,7 @@ import { PTCFile } from "./PTCFile";
  */
 async function ParseBuffer(buffer: Buffer, verify: boolean = false): Promise<GenericFile> {
     // detect the correct file type using the magic number
-    let magic = buffer.toString('ascii', 0, 4);
+    let magic = buffer.toString('latin1', 0, 4);
     let file;
     switch(magic) {
         case "PX01":

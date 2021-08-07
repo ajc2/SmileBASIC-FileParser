@@ -3,6 +3,8 @@ import { PTCFileType } from "./PTCFileType";
 import { PTCPackageBits } from "./PTCPackageBits";
 
 class PTCPRGFile extends PTCFile {
+    public readonly Type = PTCFileType.PRG;
+    
     public Content: string;
 
     public PackagedFiles: Map<PTCPackageBits, typeof PTCFile>;
@@ -12,7 +14,6 @@ class PTCPRGFile extends PTCFile {
 
     public constructor() {
         super();
-        this.Type = PTCFileType.PRG;
         this.Content = "";
         this.PackagedFiles = new Map();
         this.MysteryBytes = Buffer.alloc(4);
