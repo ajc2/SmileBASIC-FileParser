@@ -3,14 +3,13 @@ import { PTCFileType } from "./PTCFileType";
 import { PTCCOLFile, PTCColor } from "./PTCCOLFile";
 
 class PTCGRPFile extends PTCFile {
-    public readonly Type = PTCFileType.GRP;
-
     public Image: Buffer;
 
 
     public constructor() {
         super();
         this.Image = Buffer.alloc(49152);
+        this.Type = PTCFileType.GRP;
     }
 
     

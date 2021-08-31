@@ -4,14 +4,13 @@ import { PTCCHRFile } from "./PTCCHRFile";
 import { PTCCOLFile, PTCColor } from "./PTCCOLFile";
 
 class PTCSCRFile extends PTCFile {
-    public readonly Type = PTCFileType.SCR;
-
     public Tiles: PTCTile[];
 
 
     public constructor() {
         super();
         this.Tiles = new Array<PTCTile>(4096);
+        this.Type = PTCFileType.SCR;
         for(let i = 0; i < 4096; i++) {
             this.Tiles[i] = new PTCTile(0,0,false,false);
         }

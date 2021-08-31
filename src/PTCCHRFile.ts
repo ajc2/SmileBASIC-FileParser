@@ -3,8 +3,6 @@ import { PTCCOLFile, PTCColor } from "./PTCCOLFile";
 import { PTCFileType } from "./PTCFileType";
 
 class PTCCHRFile extends PTCFile {
-    public readonly Type = PTCFileType.CHR;
-    
     /**
      * An array of 64-byte `Buffer`s, each byte representing
      * a nybble (0-F) referring to a palette color.
@@ -15,6 +13,7 @@ class PTCCHRFile extends PTCFile {
     public constructor() {
         super();
         this.Characters = new Array<Buffer>(256);
+        this.Type = PTCFileType.CHR;
         for(let i = 0; i < 256; i++) {
             this.Characters[i] = Buffer.alloc(64);
         }

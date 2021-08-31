@@ -1,22 +1,20 @@
 import { PTCFile } from "./PTCFile";
 import { PTCFileType } from "./PTCFileType";
-import { PTCPackageBits } from "./PTCPackageBits";
+import { PTCPackageBits, PTCPackageTypes } from "./PTCPackageBits";
 
 class PTCPRGFile extends PTCFile {
-    public readonly Type = PTCFileType.PRG;
-    
     public Content: string;
 
-    public PackagedFiles: Map<PTCPackageBits, typeof PTCFile>;
+    public PackagedFiles: Map<PTCPackageBits, PTCFile>;
 
-    public MysteryBytes: Buffer;
+    private _topbits = 0;
 
 
     public constructor() {
         super();
         this.Content = "";
         this.PackagedFiles = new Map();
-        this.MysteryBytes = Buffer.alloc(4);
+        this.Type = PTCFileType.PRG;
     }
 
 
@@ -28,14 +26,34 @@ class PTCPRGFile extends PTCFile {
         let self = new PTCPRGFile();
         self.Header = file.Header;
         self.RawContent = file.RawContent;
-
-        self.RawContent.copy(self.MysteryBytes, 0, 0, 4);
         
         // read text content
         let length = self.RawContent.readUInt32LE(8);
         self.Content = self.RawContent.toString('latin1', 12, 12+length);
 
-        // TODO: package format
+        // read package string
+        let hi = self.RawContent.readUInt32LE(0);
+        if((hi & 0xFFFFE000) !== 0) {
+            throw new Error(`Invalid package string (hi is ${hi})`);
+        }
+        let lo = self.RawContent.readUInt32LE(4);
+        let packageStr = hi << 32 | lo;
+        let pos = 12+length;
+
+        // unpack resources
+        for(let i = 0; i < 45; i++) {
+            let bit = packageStr >> i & 1;
+            if(!bit) continue;
+            let expectType = PTCPackageTypes.get(i)!!
+            let size = PTCPRGFile.TYPESIZES.get(expectType)!!;
+            let fbuf = self.RawContent.subarray(pos, pos+size+12);
+            let file = await PTCFile.FromBuffer(fbuf);
+            if(file.Type !== expectType) {
+                throw new Error(`Invalid package format (got ${file.Type} at ${i})`);
+            }
+            self.PackagedFiles.set(i, await file.ToActualType());
+            pos += size+12;
+        }
 
         return self;
     }
@@ -51,12 +69,11 @@ class PTCPRGFile extends PTCFile {
         // monkeypatch: copy the package contents out of RawContent so
         // we pass round trip before implementing package format
         let packageBuf = this.RawContent.subarray(12+this.Content.length)
-        let packageStr = this.RawContent.subarray(4, 8)
+        let packageStr = this.RawContent.subarray(0, 8)
 
         // build the header
         let head = Buffer.allocUnsafe(12);
-        this.MysteryBytes.copy(head, 0);
-        packageStr.copy(head, 4);
+        packageStr.copy(head, 0);
         head.writeUInt32LE(this.Content.length, 8);
 
         // concat contents
@@ -68,6 +85,14 @@ class PTCPRGFile extends PTCFile {
 
         return super.ToBuffer(sdHeader);
     }
+
+    public static readonly TYPESIZES = new Map<PTCFileType, number>([
+        [PTCFileType.CHR, 8192],
+        [PTCFileType.COL, 512],
+        [PTCFileType.MEM, 516],
+        [PTCFileType.GRP, 49152],
+        [PTCFileType.SCR, 8192]
+    ]);
 }
 
 

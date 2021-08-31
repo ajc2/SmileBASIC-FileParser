@@ -2,14 +2,13 @@ import { PTCFile } from "./PTCFile";
 import { PTCFileType } from "./PTCFileType";
 
 class PTCMEMFile extends PTCFile {
-    public readonly Type = PTCFileType.MEM;
-
     private _content: string = "";
 
 
     public constructor() {
         super();
         this.Content = "";
+        this.Type = PTCFileType.MEM;
     }
 
     

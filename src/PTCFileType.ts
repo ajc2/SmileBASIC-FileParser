@@ -1,12 +1,12 @@
 // -*- coding: utf-8
 
 enum PTCFileType {
-    PRG = "0300RPRG",
-    CHR = "0100RCHR",
-    COL = "0100RCOL",
-    MEM = "0200RMEM",
-    GRP = "0100RGRP",
-    SCR = "0100RSCR"
+    PRG,
+    CHR,
+    COL,
+    GRP,
+    SCR,
+    MEM
 }
 
 function typeEnumToString(en: PTCFileType): string {

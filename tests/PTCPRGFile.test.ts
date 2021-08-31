@@ -1,5 +1,7 @@
 import * as fs from "fs";
 import * as path from "path";
+import { PTCPackageBits, PTCPackageTypes } from "../src/PTCPackageBits";
+import { PTCFileType } from "../src/PTCFileType";
 import { PTCPRGFile } from "../src/PTCPRGFile";
 
 test("instantiate PTCPRGFile", () => {
@@ -20,4 +22,9 @@ test("PTCPRGFile content decoding", async () => {
     let buf = fs.readFileSync(path.join(__dirname, "ptc_binaries/GOAT.PTC"),{encoding:null});
     let file = await PTCPRGFile.FromBuffer(buf);
     expect(file.Content).toBe("'GOAT\r");
+});
+
+test("PTCPRGFile package test", async () => {
+    let buf = fs.readFileSync(path.join(__dirname, "ptc_binaries/BIGPKG.PTC"),{encoding:null});
+    let file = await PTCPRGFile.FromBuffer(buf);
 });

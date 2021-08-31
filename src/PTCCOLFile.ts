@@ -2,8 +2,6 @@ import { PTCFile } from "./PTCFile";
 import { PTCFileType } from "./PTCFileType";
 
 class PTCCOLFile extends PTCFile {
-    public readonly Type = PTCFileType.COL;
-    
     /**
      * An array of 256 {@see PTCColor} wrapper objects.
      */
@@ -13,6 +11,7 @@ class PTCCOLFile extends PTCFile {
     public constructor() {
         super();
         this.Colors = new Array<PTCColor>(256)
+        this.Type = PTCFileType.COL;
         for(let i = 0; i < 256; i++) {
             this.Colors[i] = new PTCColor(0,0,0);
         }

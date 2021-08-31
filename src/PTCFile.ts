@@ -4,7 +4,8 @@ import { createHash, Hash } from "crypto";
 import { GenericFile } from "./GenericFile";
 import { PTCSDHeader } from "./PTCSDHeader";
 import { FileFormat } from "./FileFormat";
-import { PTCFileType, typeStringToEnum, typeEnumToString } from "./PTCFileType";
+import { PTCFileType, typeEnumToString, typeStringToEnum } from "./PTCFileType";
+import { PTC_TYPES } from "./PTCConstants";
 
 // Promisify these guys so we aren't using callbacks
 const inflateAsync = promisify(inflate);
@@ -27,7 +28,20 @@ class PTCFile implements GenericFile {
     /**
      * Corresponding resource type
      */
-    public Type: PTCFileType | null;
+    private _type: PTCFileType | null;
+
+    public set Type(t: PTCFileType | null) {
+        this._type = t;
+    }
+
+    public get Type(): PTCFileType | null {
+        if(this._type !== null && this._type in PTC_TYPES) {
+            return PTC_TYPES[this._type as keyof typeof PTC_TYPES];
+        }
+        else {
+            return null;
+        }
+    }
 
     
     public static FileTypeMappings: Map<PTCFileType, typeof PTCFile> = new Map();
@@ -36,7 +50,7 @@ class PTCFile implements GenericFile {
     public constructor() {
         this.Header = new PTCSDHeader();
         this.RawContent = Buffer.alloc(0);
-        this.Type = null;
+        this._type = null;
     }
     
     public static async FromBuffer(buffer: Buffer, verifyHash: boolean = false): Promise<PTCFile> {
@@ -66,6 +80,9 @@ class PTCFile implements GenericFile {
         else if(magic === "PETC") {
             let typecode = buffer.toString('latin1', 4, 12);
             file.Type = typeStringToEnum(typecode);
+            if(file.Type === null) {
+                throw new Error(`Unrecognized file type (${typecode})`);
+            }
             file.RawContent = buffer.subarray(12);
         }
         else {
@@ -74,8 +91,6 @@ class PTCFile implements GenericFile {
 
         return file;
     }
-
-    //public static async FromQRData(qrs: Buffer[]): Promise<PTCFile> = TODO();
     
     public static async FromFile(file: PTCFile): Promise<PTCFile> {
         return file;
@@ -110,15 +125,13 @@ class PTCFile implements GenericFile {
     }
 
     public async ToActualType(): Promise<PTCFile> {
-        if (this.Type !== null && PTCFile.FileTypeMappings.has(this.Type!)) {
+        if(this.Type !== null && PTCFile.FileTypeMappings.has(this.Type)) {
             return PTCFile.FileTypeMappings.get(this.Type!)!.FromFile(this);
         }
         else {
-            throw new Error("Unimplemented file type");
+            throw new Error(`Unimplemented file type (${this.Type})`);
         }
     }
-
-    //public async ToQRData(qrCapacity: number): Promise<Buffer[]> = TODO();
 
     
     private verifyHash(): boolean {
